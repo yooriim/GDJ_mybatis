@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="student">
+	<insert id="insertStudent">
+		INSERT INTO STUDENT VALUES(SEQ_STUDENT.NEXTVAL,
+		'유병승','01012341234','yoo@yoo.com','경기도 시흥시',default)
+	</insert>
+	
+	<!-- 
+		매개변수있는 쿼리문 실행하기
+		매핑되는 값을 #{명칭}로 작성
+	-->
+	<insert id="insertStudentName" parameterType="string">
+		INSERT INTO STUDENT VALUES(SEQ_STUDENT.NEXTVAL,
+		#{name},'01012341234','yoo@yoo.com','경기도 시흥시',default)		
+	</insert>
+	
+	<insert id="insertStudentInfo" parameterType="student">
+		INSERT INTO STUDENT VALUES(SEQ_STUDENT.NEXTVAL,
+		#{name},#{tel},#{email},#{addr},default) 
+	</insert>
+	
+<!-- 	<update id="updateStudent" parameterType="com.mybatis.model.vo.Student"> -->	
+		<update id="updateStudent" parameterType="student">
+		UPDATE STUDENT 
+		SET STUDENT_TEL=#{tel} ,STUDENT_EMAIL=#{email}, STUDENT_ADDR=#{addr} 
+		WHERE STUDENT_NO=#{no}
+	</update>
+
+	<!-- 
+		select 태그는 반드시 resultType||resultMap속성을 선언해줘야 한다.
+		resultType : 실제 java에서 사용하고 있는 타입을 지정할 때 사용 
+		resultMap : vo객체와 테이블의 명칭이 불일치할 때 매핑시켜주는 mybatis용 객체를 선언해서 이용할 때 
+	 -->
+	<select id="selectStudentCount" resultType="_int">
+		SELECT COUNT(*) FROM STUDENT
+	</select>
+		
+		<!-- 
+			id 태그 : pk값을 갖는 데이터
+			result 태그 : 일반 데이터 
+			설정 속성 : property(객체필드), column(resultSet 컬럼명)
+			
+			테이블 객체 연관관게 매핑
+			association 태그
+			collection 태그
+			
+		 -->
+	<resultMap type="com.mybatis.model.vo.Student" id="studentMap">
+		 <id property="no" column="student_no"/>
+		 <result property="name" column="student_name"/>
+		 <result property="tel" column="student_tel"/>
+		 <result property="email" column="student_email"/>
+		 <result property="addr" column="student_addr"/>
+	</resultMap>
+	
+<!-- 	<select id="selectStudent" parameterType="_int" resultType="com.mybatis.model.vo.Student"> 
+		resultType || resultMap 둘중하나면 쓰면 댐 
+-->
+		<!-- SELECT student_no as no, student_name as name,student_tel as phone, student_email as email,
+		student_addr as addr, reg_date -->
+		
+	<select id="selectStudent" parameterType="_int" resultMap="studentMap">
+		SELECT *
+		FROM STUDENT WHERE STUDENT_NO=#{no}	
+	</select>
+	
+<!-- 		selectList를 썼으면 resultType에 list를 쓰면안댐 기본적으로 그냥 list를 반환하기 때문..? 암튼 쓰면 아ㄴ댄다~ 
+			resultType쓰고싶으면 컬럼명 별칭써서 select해주며낻ㅁ
+				 -->
+	<select id="selectStudentAll" resultMap="studentMap">
+		SELECT * FROM STUDENT
+	</select>
+	
+	<select id="selectStudentName" parameterType="String" resultMap="studentMap">
+		SELECT * FROM STUDENT WHERE STUDENT_NAME LIKE '%'||#{name}||'%'
+	</select>
+	
+	<select id="selectStudentMap" parameterType="_int" resultType="map">
+		SELECT * FROM STUDENT WHERE STUDENT_NO=#{no}
+	</select>
+	
+	<select id="selectStudentAllMap" resultType="map">
+		SELECT * FROM STUDENT
+	</select>
+	
+	<!-- 페이징처리할떄 쓰는 ROWNUM 어쩌구 이런거 안해도 됨 ! 정렬도 그냥 여기 쿼리문에서 하면댐  -->
+	<select id="selectPageList" resultMap="studentMap">
+		SELECT * FROM STUDENT
+	</select>
+	
+</mapper>
+
+
