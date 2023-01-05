@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="board">
+	<resultMap type="board" id="boardMap">
+		<id property="boardNo" column="board_no"/>
+		<result property="boardWriter" column="board_title"/>
+		<result property="boardContent" column="board_content"/>
+		<result property="boarddOrginalFileName" column="board_original_filename"/>
+		<result property="boardRenamedFileName" column="board_renamed_filename"/>
+		<result property="boardDate" column="board_date"/>
+		<result property="boardReadCount" column="board_readcount"/>
+		<collection property="comments" ofType="boardcomment">
+			<id property="boardCommentNo" column="board_comment_no"/>
+			<result property="boardCommentLevel" column="board_comment_level"/>
+			<result property="boardCommentWriter" column="board_comment_writer"/>
+			<result property="boardCommentContent" column="board_comment_content"/>
+			<result property="boardCommentDate" column="board_comment_date"/>
+		</collection>
+	</resultMap>
+										<!-- ofType? -->
+	
+	
+<!-- 	<resultMap type="boardComment" id="commentMap">
+		<id property="boardCommentNo" column="board_comment_no"/>
+		<result property="boardCommentLevel" column="board_comment_level"/>
+		<result property="boardCommentWriter" column="board_comment_writer"/>
+		<result property="boardCommentContent" column="board_comment_content"/>
+		<result property="boardRef" column="board_ref"/>
+	
+	</resultMap> -->
+	
+	<select id="selectboard" parameterType="int" resultMap="boardMap">
+		select *
+		from(select * from board left join board_comment on board_no=board_ref where board_no=#{boardNo})
+		start with board_comment_level=1
+		connect by prior board_comment_no=board_comment_ref
+
+	</select>
+	
+	<!-- 실제있는거 아님 걍 핸들러 해볼라고 적은거 -->
+	<resultMap type="member" id="memberMap">
+		<result property="hobby" column="hobby" typeHandler="com.emp.common.StringArrayTypeHandler"/>
+	</resultMap>
+	
+	<insert id="insertMember">
+<!-- 		INSERT INTO MEMBER VALUES(... #{hobby}	)이렇게 쓰면 들어갈까 ? 아뉘 hobby는 배열 		 -->
+		INSERT INTO MEMBER VALUES(... #{hobby, typeHandler=com.emp.common.StringArrayTypeHandler}	) 
+														<!-- 따옴표 x 이렇게하면 setString까지해서 다 넘어와서 그ㅑㄴㅇ 불러올수잇숨 -->		
+	</insert>
+	
+	
+	
+
+</mapper>
